@@ -1,17 +1,17 @@
 import { fastify } from 'fastify'
-import { DatabaseMemory } from './database-memory.js'
+import { DatabasePostgres } from './database-postgres.js'
 import { describe } from 'node:test'
 
 const server = fastify()
 
-const database = new DatabaseMemory()
+const database = new DatabasePostgres()
 
 // POST http://localhost:3333/videos Rota para criar os vídeos
 
-server.post('/videos', (request, reply) => {
+server.post('/videos', async (request, reply) => {
     const { title, description, duration } = request.body
 
-    database.create({
+    await database.create({
         title: title,
         description: description,
         duration: duration,
@@ -20,8 +20,10 @@ server.post('/videos', (request, reply) => {
     return reply.status(201).send()
 })
 
-server.get('/videos', (request, reply) => {
-    const videos = database.list()
+server.get('/videos', async (request, reply) => {
+    const search = request.query
+
+    const videos = await database.list(search)
 
     return videos
 })
@@ -41,8 +43,12 @@ server.put('/videos/:id', (request) => {
     return reply.status(204).send
 })
 
-server.delete('/videos/:id', () => {
-    return 'Hello World'
+server.delete('/videos/:id', (request, reply) => {
+    const videoId = request.params.id
+
+    database.delete(videoId)
+
+    return reply.status(204).send()
 })
 
 server.listen({
