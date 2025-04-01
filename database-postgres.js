@@ -2,15 +2,15 @@ import { randomUUID } from "node:crypto"
 import { sql } from './db.js'
 
 export class DatabasePostgres {
-    #videos = new Map()
+    videos = new Map()
 
     async list(search) { 
         let videos
 
         if (search) {
-            videos = await sql`select * from videos where title ilike ${'%' + search + '%'}`
+            videos = await sql`SELECT * FROM videos WHERE title ILIKE ${'%' + search + '%'}`;
         } else {
-            videos = await sql`select * from videos`
+            videos = await sql`SELECT * FROM videos`;
         }
         
         return videos
@@ -23,11 +23,14 @@ export class DatabasePostgres {
         await sql`insert into videos (id, title, description, duration) values (${videoId}, ${title}, ${description}, ${duration})`
     }
 
-    update(id, video) {
+    async update(id, video) {
+        const { title, description, duration } = video
+
+        await sql`update videos set title = ${title}, description = ${description}, duration = ${duration} where id = ${id}`
        
     }
 
-    delete(id) {
-        
+    async delete(id) {
+        await sql`delete from videos where id = ${id}`
     }
 }
