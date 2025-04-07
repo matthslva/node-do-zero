@@ -1,6 +1,6 @@
 Projeto CRUD para aprendizagem, foram utilizados:
 
 - NodeJS;
-- Framework Fastfy;
+- Framework Fastify;
 - Postgres 17 (Neon);
 - Render (Deploy).
